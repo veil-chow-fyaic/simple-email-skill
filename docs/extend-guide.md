@@ -2,6 +2,26 @@
 
 本仓库的核心理念:**通用收发能力(核心)与业务处理(下游)物理隔离**。核心 `scripts/` 永远干净,业务逻辑放在可剥离的 `examples/` 里。本文教你怎么把邮件能力接到你自己的下游——分类、提取、写表、接入 LLM、定时任务等。
 
+## TL;DR
+
+想做邮件分类/写表,**不用改代码,改规则就行**:
+
+```bash
+# 1. 复制规则文件,改成你自己的(参考真实邮箱范例)
+cp examples/classifier/rules.realbox.example.json rules.json
+# 编辑 rules.json:改 fromContains/subjectContains/extract
+
+# 2. 一条命令跑出表格
+node examples/workflow/pipeline.js --rules rules.json --out ./output/report.xlsx --since-days 30
+```
+
+规则 = 「发件人/主题关键词」匹配 + 「正则提取字段」。看 `examples/classifier/rules.realbox.example.json` 里的真实例子(订单号、退款金额、会员有效期都怎么提的),5 分钟就会。
+
+**三种扩展方式(按需选)**:
+- 改规则(最快) → 下文「二」
+- 用代码调核心库(最灵活) → 下文「三」
+- 接 LLM 做语义分类(最智能) → 下文「四」
+
 ## 一、核心层只给你一件事:标准化的邮件对象
 
 所有核心收信命令的输出,都是**同一个结构**的 JSON 对象(见 `scripts/lib/format.js` 的 `normalize`):

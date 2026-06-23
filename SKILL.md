@@ -1,72 +1,81 @@
 ---
 name: simple-email
-description: 通用 IMAP/SMTP 邮件技能。任意 agent 加载即可获得收发邮件能力:列出/读取/搜索邮件、标记已读未读、下载附件、发送纯文本/HTML/带附件邮件。兼容 Foxmail、QQ、163、126、Gmail、Outlook、新浪等所有标准 IMAP/SMTP 服务。输出结构化 JSON,便于程序处理。
+description: 通用 IMAP/SMTP 邮件技能。任意 agent 加载即可收发邮件、搜索、标记、下载附件、自动分类导出表格。兼容 Foxmail/QQ/163/126/Gmail/Outlook/新浪等所有标准服务。输出结构化 JSON。Node.js。
 ---
 
-# Simple Email — 通用邮件技能
+# Simple Email Skill
 
-一个可被任意 agent 加载的通用 email skill。本技能只提供**通用收发能力**;分类、提取、写表等业务逻辑属于下游扩展(见仓库 `examples/` 与 `docs/extend-guide.md`)。
+通用 email skill。你(agent)可以用它收发邮件,所有命令输出**结构化 JSON**,直接解析。
 
-## 你能做什么
+## ⚡ 速查:用户想做什么 → 跑哪条命令
 
-| 能力 | 命令 |
+| 用户意图 | 命令 |
 |---|---|
-| 列出邮件 | `node scripts/imap.js list [--limit 20] [--unread] [--mailbox INBOX]` |
-| 读取一封 | `node scripts/imap.js read <uid>` |
-| 搜索 | `node scripts/imap.js search <关键词>` |
-| 标记已读/未读 | `node scripts/imap.js mark <uid> --read` / `--unread` |
-| 下载附件 | `node scripts/imap.js attach <uid>` |
-| 列出信箱 | `node scripts/imap.js mailbox` |
-| 发邮件 | `node scripts/smtp.js send --to a@b.com --subject 标题 --text 内容` |
-| 自检连通性 | `node scripts/doctor.js` |
+| "看我的未读邮件" | `node scripts/imap.js list --unread --limit 10 --format text` |
+| "读第 N 封" | `node scripts/imap.js read <uid>` |
+| "搜含 XX 的邮件" | `node scripts/imap.js search "XX"` |
+| "标记这封已读" | `node scripts/imap.js mark <uid> --read` |
+| "下载这封的附件" | `node scripts/imap.js attach <uid>` |
+| "发邮件给 X" | `node scripts/smtp.js send --to X --subject 标题 --text 内容` |
+| "把邮件分类整理成表格" | `node examples/workflow/pipeline.js --out ./output/report.xlsx` |
+| "检查配置对不对" | `node scripts/doctor.js` |
 
-所有命令默认输出 JSON。`--format text` 给人类可读摘要。
+## 📋 输出契约(每封邮件都是这个结构)
 
-## 前置:配置凭据(一次性)
-
-1. 复制 `.env.example` 为 `.env`
-2. 填入 `EMAIL_USER`(邮箱地址)和 `EMAIL_PASS`(**授权码,不是登录密码**)
-3. 服务商一般按邮箱后缀自动识别(foxmail→qq 服务器、@163→163 …);无需手动填 host
-
-获取授权码见 `docs/foxmail-setup.md`(Foxmail/QQ/163/Gmail 均有图文)。
-
-跑一次自检确认连通:
-
-```bash
-node scripts/doctor.js
+```jsonc
+{
+  "uid": 1793,                              // 唯一 ID,后续 read/mark/attach 用它
+  "subject": "极速退款成功",
+  "from": { "name": "淘宝网", "address": "taobao@news.mail.taobao.com" },
+  "to": [{ "name": "", "address": "..." }],
+  "date": "2023-07-08T02:04:01.000Z",
+  "flags": ["\\Seen"],                       // \Seen=已读
+  "text": "纯文本正文",
+  "html": "<html>正文</html>",
+  "attachments": [{ "filename": "f.pdf", "size": 12345 }]
+}
 ```
 
-三步全 `ok` 即配置正确。
+`list` 默认不返回全文(只给 snippet 摘要);要全文用 `read <uid>`。
 
-## 典型用法(agent 视角)
+## 🔧 前置:确认环境
 
-收到「看一下我的未读邮件」之类的请求时:
-1. 先确认 `.env` 存在(否则提示用户配置)
-2. `node scripts/imap.js list --unread --limit 10 --format text` 拿到未读列表
-3. 用户要看某封 → `node scripts/imap.js read <uid>`
-4. 用户要发邮件 → `node scripts/smtp.js send ...`
+1. 检查 `.env` 是否存在。没有 → 提示用户:
+   > 请复制 `.env.example` 为 `.env`,填入 `EMAIL_USER`(邮箱)和 `EMAIL_PASS`(授权码)。授权码不是登录密码,获取方式见 `docs/foxmail-setup.md`。
+2. 不确定配置对不对 → 跑 `node scripts/doctor.js`,三项 ok 即通。
 
-输出都是结构化 JSON,可直接解析后向用户汇报。
+## 🎬 典型工作流
 
-## 服务商兼容性
+**收信场景**(用户:"看看我邮箱"):
+1. `node scripts/imap.js list --limit 10 --format text` → 拿到列表
+2. 从 JSON 解析出每封的 uid/subject/from
+3. 向用户汇报;用户要看哪封 → `node scripts/imap.js read <uid>`
 
-| 邮箱 | 后缀 | IMAP | SMTP | 说明 |
-|---|---|---|---|---|
-| Foxmail / QQ | @foxmail.com @qq.com | imap.qq.com:993 | smtp.qq.com:465 | 走 QQ 服务器,授权码登录 |
-| 网易 163/126 | @163.com @126.com | imap.163.com:993 | smtp.163.com:465 | 客户端授权密码 |
-| Gmail | @gmail.com | imap.gmail.com:993 | smtp.gmail.com:465 | 两步验证 + 应用专用密码 |
-| Outlook | @outlook/@hotmail/@live | outlook.office365.com:993 | smtp.office365.com:587 | 账号密码 |
-| 新浪 | @sina.com | imap.sina.com:993 | smtp.sina.com:465 | 授权码 |
-| 其他 | — | 自定义 | 自定义 | `EMAIL_PRESET=custom` + `IMAP_HOST/SMTP_HOST` |
+**分类整理场景**(用户:"把我邮件分类导出 Excel"):
+1. `node examples/workflow/pipeline.js --out ./output/report.xlsx --since-days 30`
+2. 自动完成:拉取 → 规则分类 → 提取字段(订单号/金额/验证码)→ 生成 xlsx
+3. 告诉用户文件路径
 
-## 扩展:这个 skill 如何向下游延展
+**发信场景**(用户:"给 X 发封邮件说 Y"):
+1. `node scripts/smtp.js send --to X --subject 标题 --text Y`
 
-本技能是「邮件驱动信息处理」工作流的**前置通用层**。常见下游:
+## ⚙️ 分类规则(可自定义)
 
-- **分类 + 字段提取** → 见 `examples/classifier/`(规则引擎,零依赖,可单测)
-- **拉取→分类→提取→写表** → 见 `examples/workflow/`(端到端 pipeline,输出 CSV/xlsx)
-- **接入 LLM 语义分类** → 见 `docs/extend-guide.md`
+默认用 `examples/classifier/rules.example.json`。想自定义:
+- 复制一份为 `rules.json`,改 `fromContains`/`subjectContains`/`extract`
+- 跑 `node examples/classifier/classify.js --rules rules.json`
+- 真实邮箱范例:`examples/classifier/rules.realbox.example.json`
 
-> 想做邮件分类/写表?不要改核心 `scripts/`。把 `examples/` 复制一份、改规则或换 sink 即可。核心保持干净,业务可剥离。
+规则结构与字段提取正则写法,见 `docs/extend-guide.md`。
 
-详见 `docs/extend-guide.md`(授人以渔)与 `docs/architecture.md`(分层说明)。
+## 🚦 错误处理
+
+- 命令失败会输出 `错误:...` 到 stderr,exit code 非 0
+- 常见:`认证失败` = 授权码错或服务没开;`Socket timeout` = 网络慢,调大 `.env` 的 `EMAIL_TIMEOUT`
+- 排查第一步永远是 `node scripts/doctor.js`
+
+## 📌 边界
+
+- 核心 `scripts/`:**通用收发能力,不要加业务逻辑**。分类/提取/写表都在 `examples/`
+- 想做自己的下游:复制 `examples/` 改,或直接 `require('./scripts/lib/client')` 用核心库
+- 详细架构与扩展见 `docs/`(foxmail-setup / extend-guide / architecture)
