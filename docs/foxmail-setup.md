@@ -14,13 +14,16 @@ Foxmail 邮箱(`@foxmail.com`)本质是腾讯 QQ 邮箱,IMAP/SMTP 走 `imap.qq.c
 
 ## 获取授权码(QQ / Foxmail)
 
+> 配合下方截图操作更直观。官方授权码说明:[QQ 邮箱授权码](https://wx.mail.qq.com/list/readtemplate?name=app_intro.html#/agreement/authorizationCode)
+
 1. 浏览器登录邮箱:`https://wx.mail.qq.com`(用你的 Foxmail 账号或绑定的 QQ 登录)
-2. 顶部点 **设置** ⚙️
-3. 进入 **账号** → **账号与安全**(左侧导航)
-4. 找到 **「POP3/IMAP/SMTP/Exchange/CardDAV/CalDAV 服务」** 区域
-5. 确认服务为 **「已开启」**(若未开启,点开启,按提示用绑定的手机发短信验证)
-6. 点 **「生成授权码」**,完成短信验证后会生成一个 **16 位授权码**(全小写字母,形如 `abcdefghijklmnop`)
-7. 把这串授权码填入 `.env` 的 `EMAIL_PASS`
+2. 顶部点 **设置** ⚙️,进入 **账号** → **账号与安全**(左侧导航)
+   ![账号与安全入口](images/foxmail-step1-account.png)
+3. 找到 **「POP3/IMAP/SMTP/Exchange/CardDAV/CalDAV 服务」** 区域,确认服务为 **「已开启」**(若未开启,点开启,按提示用绑定的手机发短信验证)
+   ![IMAP/SMTP 服务](images/foxmail-step2-service.png)
+4. 点 **「生成授权码」**,完成短信验证后会生成一个 **16 位授权码**(全小写字母,形如 `abcdefghijklmnop`)
+   ![生成授权码](images/foxmail-step3-authcode.png)
+5. 把这串授权码填入 `.env` 的 `EMAIL_PASS`
 
 > ⚠️ 授权码只显示一次,请保存好。忘了或丢失就重新生成(旧的会自动失效)。一个账号可生成多个授权码,互不影响。
 
