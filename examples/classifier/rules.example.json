@@ -1,0 +1,48 @@
+{
+  "_comment": "分类规则示例。可复制为 rules.json 后自定义。规则按数组顺序匹配,第一个命中为准。",
+  "_comment2": "fromContains/subjectContains/bodyContains 不区分大小写,任一包含即命中该条件;多条件之间为「且」。",
+  "defaultCategory": "其他",
+  "rules": [
+    {
+      "name": "发票/账单",
+      "match": {
+        "fromContains": ["invoice", "发票", "电子发票", "@kingdee", "@yunding"],
+        "subjectContains": ["发票", "账单", "对账单", "invoice", "电子发票"]
+      },
+      "extract": {
+        "amount": { "pattern": "金额[:：\\s]*([0-9]+[.,]?[0-9]*)\\s*元?", "group": 1 },
+        "invoiceNo": { "pattern": "发票号码[:：\\s]*([A-Za-z0-9]+)", "group": 1 },
+        "date": { "pattern": "(20\\d{2}[年/-]\\d{1,2}[月/-]\\d{1,2}日?)", "group": 1 }
+      }
+    },
+    {
+      "name": "系统通知",
+      "match": {
+        "fromContains": ["noreply", "no-reply", "notification", "notify", "@github", "@gitlab", "@google", "alert", "alerts"],
+        "subjectContains": ["通知", "提醒", "验证码", "verification", "notification", "alert", "verify"]
+      },
+      "extract": {
+        "code": { "pattern": "(?:验证码[是为]?|verification code)[:：\\s]*([0-9A-Za-z]{4,8})", "group": 1 }
+      }
+    },
+    {
+      "name": "会议/日程",
+      "match": {
+        "subjectContains": ["会议", "邀请您参加", "meeting", "calendar", "日程", "预约"],
+        "subjectRegex": "(邀请|invite|meeting)"
+      },
+      "extract": {
+        "time": { "pattern": "(\\d{4}[年/-]\\d{1,2}[月/-]\\d{1,2}[日T\\s]\\d{1,2}:\\d{2})", "group": 1 },
+        "location": { "pattern": "地点[:：\\s]*([^\\n]{2,40})", "group": 1 }
+      }
+    },
+    {
+      "name": "订阅/推广",
+      "match": {
+        "fromContains": ["newsletter", "marketing", "promo", "@mailchimp", "unsubscribe"],
+        "subjectContains": ["优惠", "促销", "限时", "unsubscribe", "退订"]
+      },
+      "extract": {}
+    }
+  ]
+}

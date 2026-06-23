@@ -1,0 +1,62 @@
+[
+  {
+    "uid": 1001,
+    "messageId": "<inv-001@example.com>",
+    "subject": "【电子发票】您本月账单已生成",
+    "from": { "name": "云发票系统", "address": "invoice@kingdee.com" },
+    "to": [{ "name": "", "address": "feng.463728559@foxmail.com" }],
+    "date": "2026-06-20T10:30:00.000Z",
+    "flags": ["\\Seen"],
+    "text": "尊敬的客户:\n\n您本月的电子发票已生成。\n发票号码:FP20260620001\n金额:1280.50元\n开票日期:2026-06-20\n\n如有疑问请联系客服。"
+  },
+  {
+    "uid": 1002,
+    "messageId": "<code-002@example.com>",
+    "subject": "您的验证码",
+    "from": { "name": "GitHub", "address": "noreply@github.com" },
+    "to": [{ "name": "", "address": "feng.463728559@foxmail.com" }],
+    "date": "2026-06-21T08:15:00.000Z",
+    "flags": [],
+    "text": "您的验证码是:482915。该验证码 10 分钟内有效,请勿泄露给他人。"
+  },
+  {
+    "uid": 1003,
+    "messageId": "<mtg-003@example.com>",
+    "subject": "邀请您参加:Q3 产品评审会议",
+    "from": { "name": "张三", "address": "zhangsan@company.com" },
+    "to": [{ "name": "", "address": "feng.463728559@foxmail.com" }],
+    "date": "2026-06-21T14:00:00.000Z",
+    "flags": [],
+    "text": "会议邀请\n时间:2026-06-25 14:00\n地点:3号会议室\n议题:Q3 产品评审,请准时参加。"
+  },
+  {
+    "uid": 1004,
+    "messageId": "<promo-004@example.com>",
+    "subject": "限时优惠!夏季大促全场 5 折",
+    "from": { "name": "某某商城", "address": "promo@mailchimp.com" },
+    "to": [{ "name": "", "address": "feng.463728559@foxmail.com" }],
+    "date": "2026-06-22T09:00:00.000Z",
+    "flags": [],
+    "text": "夏季大促来啦!点击查看更多优惠。如不想接收请 unsubscribe。"
+  },
+  {
+    "uid": 1005,
+    "messageId": "<inv-005@example.com>",
+    "subject": "2026年6月对账单",
+    "from": { "name": "财务部", "address": "finance@yunding.com" },
+    "to": [{ "name": "", "address": "feng.463728559@foxmail.com" }],
+    "date": "2026-06-22T16:00:00.000Z",
+    "flags": ["\\Seen"],
+    "text": "您好,附件为本月对账单。\n金额:5600元\n发票号码:YS20260622005\n日期:2026-06-22\n请核对,谢谢。"
+  },
+  {
+    "uid": 1006,
+    "messageId": "<misc-006@example.com>",
+    "subject": "周末聚餐",
+    "from": { "name": "李四", "address": "lisi@friends.com" },
+    "to": [{ "name": "", "address": "feng.463728559@foxmail.com" }],
+    "date": "2026-06-23T11:00:00.000Z",
+    "flags": [],
+    "text": "周六晚上一起吃饭吗?老地方,6点见。"
+  }
+]

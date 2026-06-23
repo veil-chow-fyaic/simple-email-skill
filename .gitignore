@@ -1,0 +1,23 @@
+# 凭据与本地配置(绝不入库)
+.env
+.env.local
+*.local
+
+# 依赖
+node_modules/
+
+# 运行产物 / 附件下载
+output/
+downloads/
+attachments/
+*.csv
+*.xlsx
+!rules.example.json
+
+# 日志
+*.log
+npm-debug.log*
+
+# 系统
+.DS_Store
+Thumbs.db
