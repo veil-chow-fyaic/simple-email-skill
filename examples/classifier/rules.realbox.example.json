@@ -1,0 +1,51 @@
+{
+  "_comment": "针对 feng.463728559@foxmail.com 真实邮件定制的规则(演示用)。展示如何按自己的邮件类型写规则。",
+  "defaultCategory": "其他/个人",
+  "rules": [
+    {
+      "name": "云服务通知",
+      "match": {
+        "fromContains": ["@aliyun.com", "@cloud.tencent", "monitor"],
+        "subjectContains": ["安全周报", "告警", "监控", "资产安全"]
+      },
+      "extract": {}
+    },
+    {
+      "name": "会员/订阅服务",
+      "match": {
+        "fromContains": ["@tencent.com", "vip", "会员", "film@"],
+        "subjectContains": ["会员", "开通", "到期", "续费", "vip"]
+      },
+      "extract": {
+        "expire": { "pattern": "有效期至[:：\\s]*([0-9/\\-年月日]+)", "group": 1 }
+      }
+    },
+    {
+      "name": "电商交易",
+      "match": {
+        "fromContains": ["taobao.com", "tmall", "京东", "@jd.com"],
+        "subjectContains": ["交易", "订单", "退款", "退货", "发货", "物流", "满意度"]
+      },
+      "extract": {
+        "orderNo": { "pattern": "订单编号[:：\\s]*([0-9]+)", "group": 1 },
+        "amount": { "pattern": "退款([0-9]+[.,]?[0-9]*)元?", "group": 1 }
+      }
+    },
+    {
+      "name": "营销推广",
+      "match": {
+        "fromContains": ["unsubscribe", "marketing", "honors@hilton", "广告", "promo"],
+        "subjectContains": ["unsubscrib", "广告", "促销", "deals", "特惠", "优惠"]
+      },
+      "extract": {}
+    },
+    {
+      "name": "邮箱服务商通知",
+      "match": {
+        "fromContains": ["@netease.com", "@qq.com", "@foxmail.com", "小助手"],
+        "subjectContains": ["提示", "升级", "通知", "防护", "安全"]
+      },
+      "extract": {}
+    }
+  ]
+}
