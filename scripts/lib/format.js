@@ -107,11 +107,17 @@ function printText(data) {
   }
 }
 
-// 截取正文摘要
+// 截取正文摘要(清洗 HTML/URL 噪音)
 function snippet(text, max = 80) {
   if (!text) return '';
-  const flat = String(text).replace(/\s+/g, ' ').trim();
-  return flat.length > max ? flat.slice(0, max) + '…' : flat;
+  let s = String(text);
+  // 去除残留的 HTML 标签和图片/链接 URL
+  s = s.replace(/<[^>]+>/g, ' ');
+  s = s.replace(/https?:\/\/\S+/g, '');
+  s = s.replace(/\[[^\]]*\]\(\s*\)/g, ' '); // 空 markdown 链接残留
+  // 压缩空白
+  s = s.replace(/\s+/g, ' ').trim();
+  return s.length > max ? s.slice(0, max) + '…' : s;
 }
 
 module.exports = { normalize, addresses, addressToOne, printResult, snippet };

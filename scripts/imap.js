@@ -87,16 +87,13 @@ async function cmdList(opts) {
     const last = uids.slice(-limit).reverse();
     if (!last.length) return [];
     const msgs = [];
-    for await (const m of client.fetch(last, { envelope: true, source: true, flags: true, internalDate: true }, { uid: true })) {
-      const norm = await normalize(m, { includeBody: false });
-      // 列表场景给个摘要更实用
-      norm.snippet = '';
-      const withText = await client.fetchOne(m.uid, { source: true }, { uid: true });
-      if (withText) {
-        const full = await normalize(withText, { includeBody: true });
-        norm.snippet = snippet(full.text, 100);
-      }
-      msgs.push(norm);
+    // 单次 fetch 取 source,本地一次性解析出元信息 + 摘要,避免重复抓取导致超时
+    for await (const m of client.fetch(last, { source: true, flags: true, internalDate: true }, { uid: true })) {
+      const full = await normalize(m, { includeBody: true });
+      full.snippet = snippet(full.text, 100);
+      full.text = '';  // 列表场景不返回全文,只保留摘要,减小体积
+      full.html = '';
+      msgs.push(full);
     }
     return msgs;
   });
