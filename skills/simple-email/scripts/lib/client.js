@@ -8,13 +8,20 @@ const { ImapFlow } = require('imapflow');
 const nodemailer = require('nodemailer');
 const path = require('path');
 
-// 加载 .env(用户本地)。dotenv 不是核心依赖,用最小自实现避免新增依赖。
+// 加载 .env(用户凭据)。查找顺序:当前工作目录(用户项目根)→ 向上逐级找。
+// 这样无论 skill 装在哪(~/.claude/skills 或项目内),凭据都从用户项目根读取。
 function loadEnv() {
   const fs = require('fs');
-  for (const candidate of [
-    path.resolve(process.cwd(), '.env'),
-    path.resolve(__dirname, '..', '..', '.env'),
-  ]) {
+  const candidates = [path.resolve(process.cwd(), '.env')];
+  // 向上逐级查找,最多 6 层
+  let dir = process.cwd();
+  for (let i = 0; i < 6; i++) {
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+    candidates.push(path.resolve(dir, '.env'));
+  }
+  for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
       const lines = fs.readFileSync(candidate, 'utf8').split(/\r?\n/);
       for (const line of lines) {
